@@ -2,13 +2,20 @@ name: Check for new Tabby releases
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *" # Check every 6 hours
   workflow_dispatch:
 
 jobs:
   check-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # For creating tags
+      actions: write # For triggering workflows
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check latest Tabby release
         id: check
         uses: actions/github-script@v7
