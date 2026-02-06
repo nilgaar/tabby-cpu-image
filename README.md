@@ -1,12 +1,10 @@
 # tabby-community-images
 
-A community-maintained CPU and ROCm Docker images for [TabbyML Tabby](https://github.com/TabbyML/tabby).
+A community-maintained CPU Docker image for [TabbyML Tabby](https://github.com/TabbyML/tabby).
 
 ## About
 
-This project provides a Docker image for running Tabby with CPU-only support and ROCm support. The official Tabby project currently focuses on GPU-accelerated images.
-
-🚨 **Note on ROCm:** While ROCm images are built, they have not been tested. Use at your own risk.
+This project provides a Docker image for running Tabby with CPU-only support. The official Tabby project now supports ROCm images, so this project focuses exclusively on CPU-optimized builds.
 
 > **Note:** This is a community-maintained project and is not officially supported by TabbyML. For the official Tabby project, visit [TabbyML/tabby](https://github.com/TabbyML/tabby).
 
