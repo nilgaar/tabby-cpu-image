@@ -1,5 +1,11 @@
+ARG RUST_VERSION=1.83
 ARG UBUNTU_VERSION=24.04
-FROM ubuntu:${UBUNTU_VERSION} AS build
+
+# =========================
+# Build Stage
+# =========================
+FROM rust:${RUST_VERSION}-slim-bookworm AS build
+
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/workspace
 
@@ -7,23 +13,19 @@ WORKDIR /root/workspace
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
-    curl \
     git \
     cmake \
     build-essential \
     pkg-config \
     libssl-dev \
     protobuf-compiler \
+    curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ---- Clone the repository with submodules ----
 ARG TABBY_REPO=https://github.com/TabbyML/tabby.git
 ARG TABBY_VERSION=main
 RUN git clone --recurse-submodules --branch ${TABBY_VERSION} --depth 1 ${TABBY_REPO} .
-
-# ---- Install Rust ----
-RUN curl https://sh.rustup.rs -sSf | bash -s -- --default-toolchain stable -y
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 # ---- Build Tabby and llama-cpp-server (CPU only, community edition) ----
 # Note: Building without enterprise features (no --features ee)
@@ -37,6 +39,7 @@ RUN cargo build --no-default-features --features prod --release --package tabby 
 # Runtime Stage
 # =========================
 FROM ubuntu:${UBUNTU_VERSION} AS runtime
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # ---- Install runtime dependencies ----
@@ -52,7 +55,9 @@ RUN apt-get update && \
 
 # ---- Configure runtime ----
 RUN git config --system --add safe.directory "*"
+
 COPY --from=build /opt/tabby /opt/tabby
+
 ENV PATH="$PATH:/opt/tabby/bin"
 ENV TABBY_ROOT=/data
 
